@@ -1,4 +1,4 @@
 # valuInvesting
 
 Link to the notebook
-https://yashnotion.notion.site/Coding-Strategy-70ec4ed807c74e3590f4f4aa56b35e3a
+https://yashnotion.notion.site/Idea-Sharing-Board-f075d76e94c544329934208fc2a590a4
