@@ -13,4 +13,4 @@ metrics = finnhub_client.company_basic_financials('AAPL', 'all')
 # pd.DataFrame(metrics['series']['quarterly']['cashRatio'])#.keys()
 sp500
 
-# %%
+# %
