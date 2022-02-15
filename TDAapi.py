@@ -2,10 +2,10 @@
 import imp
 from multiprocessing.connection import Client
 import pandas as pd
-from pyvirtualdisplay import Display
 import tda
 import atexit
 import os
+import httpx
 
 # import chromedriver_binary  # Adds chromedriver binary to path
 
@@ -19,14 +19,9 @@ SP500_URL = "https://tda-api.readthedocs.io/en/latest/_static/sp500.txt"
 def make_webdriver():
     # Import selenium here because it's slow to import
     from selenium import webdriver
-    from selenium.webdriver.chrome.service import Service
-    from selenium.webdriver.chrome.options import Options
-    chrome_options = Options()
-    # chrome_options.add_argument("--headless") # Ensure GUI is off
-    # chrome_options.add_argument("--no-sandbox")
-    # webdriver_service = Service("/mnt/c/Users/bojri/Desktop/valuInvesting/chromedriver")
-    driver = webdriver.Chrome(options=chrome_options)
-    # atexit.register(lambda: driver.quit())
+    
+    driver = webdriver.Chrome()
+    atexit.register(lambda: driver.quit())
     return driver
 
 # driver = make_webdriver()
@@ -41,15 +36,20 @@ client = tda.auth.client_from_login_flow(
 
 # %%
 # get stock fundamental data
-import httpx
 sp500 = httpx.get(
     SP500_URL, headers={
         "User-Agent": "Mozilla/5.0"}).read().decode().split()
-
-response = client.search_instruments(sp500[:10], client.Instrument.Projection.FUNDAMENTAL)
-# %%
-pd.DataFrame.from_dict(response.json()['A']['fundamental'],orient='index')
 # sp500
+
 # %%
-client.get_account("232046748").json()
+response = client.search_instruments(sp500[:10], client.Instrument.Projection.FUNDAMENTAL)
+
+
+# %%
+df = pd.DataFrame.from_dict(response.json()).transpose()
+fundamentals = pd.DataFrame.from_records(df['fundamental'].values)
+tickerInfo = df.drop("fundamental",axis=1).reset_index(drop=True)
+tickerInfo.merge(fundamentals,on='symbol')
+
+# client.get_account("232046748").json()
 # %%
